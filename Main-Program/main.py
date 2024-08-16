@@ -1,3 +1,4 @@
 from ServerSpecOCR import ServerSpecOCR
+from jsonify import GetSpecsJson
 
-ServerSpecOCR("images\MachineDesignBox.jpeg")
+GetSpecsJson(ServerSpecOCR("images\MachineDesignBox.jpeg"))

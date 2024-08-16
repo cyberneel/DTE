@@ -92,3 +92,6 @@ def ServerSpecOCR(imgPath=None):
     plt.imshow(imgPreview)
     plt.axis('off')
     plt.show()
+
+    # return the groups text object
+    return grouped_text_objects[-1]
