@@ -1,4 +1,4 @@
 from ServerSpecOCR import ServerSpecOCR
-from jsonify import GetSpecsJson
+from jsonify import GetSpecsJson, GetSpecsJsonCloud
 
-GetSpecsJson(ServerSpecOCR("images\MachineDesignBox.jpeg"))
+GetSpecsJsonCloud(ServerSpecOCR("images\MachineDesignBox.jpeg"))

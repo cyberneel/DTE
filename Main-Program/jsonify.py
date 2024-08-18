@@ -1,6 +1,7 @@
 # import dependencies
 import torch
 import requests
+import CONSTANTS
 from transformers import pipeline
 
 ###############################################\
@@ -25,8 +26,27 @@ def GetSpecsJson(raw=None):
     return res[0]["generated_text"]
 
 # using cloudflare API for speed and for better models (Free at the time of coding)
-def GetSpecJsonCloud(raw=None):
+def GetSpecsJsonCloud(raw=None):
     # return if blank
     if raw == None:
         return
     
+    ACCOUNT_ID = CONSTANTS.CLOUDFLARE_ACCOUNT_ID
+    AUTH_TOKEN = CONSTANTS.CLOUDFLARE_AUTH_KEY
+
+    prompt = raw
+
+    # Get the response from cloudflare
+    response = requests.post(
+    f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/@hf/thebloke/llama-2-13b-chat-awq",
+        headers={"Authorization": f"Bearer {AUTH_TOKEN}"},
+        json={
+        "messages": [
+            {"role": "system", "content": "You are an assistant that reponds with a json version of the input text and nothing else! but fix any typos like when there is a O in 2019 instead of the number 0"},
+            {"role": "user", "content": prompt}
+        ]
+        }
+    )
+    result = response.json()
+    print(result['result']['response'])
+    print(type(result))
