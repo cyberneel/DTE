@@ -18,18 +18,34 @@ ocr = easyocr.Reader(['en'], gpu=UseGPU)
 
 currentDir= os.path.dirname(__file__)
 
-def ServerSpecOCR(imgPath=None):
+def ServerSpecOCR(imgPath=None, debug=False):
     if imgPath == None:
         # no image so give up
         return None
     
     imgPath = os.path.join(currentDir, imgPath)
+    enhancedPath = os.path.join(currentDir, "temp_stuff", "ENHANCED.jpeg")
     
     # Read the image
     image = cv2.imread(imgPath)
 
+    # Convert to grayscale
+    grayscaleImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Contrast
+    enhanced_img = cv2.addWeighted(grayscaleImage, 1.5, np.zeros_like(grayscaleImage), 0, -75)
+
+    # blur
+    enhanced_img = cv2.blur(enhanced_img,(2,2))
+
+    # save the enhanced image
+    print(enhancedPath)
+    print(cv2.imwrite(enhancedPath, enhanced_img))
+
     # Run ocr
-    baseResult = ocr.readtext(imgPath)
+    baseResult = ocr.readtext(enhancedPath, mag_ratio=2)
+    if debug:
+        print(baseResult)
 
     # Extract the centers of bounding boxes
     coordinates = []
@@ -59,7 +75,6 @@ def ServerSpecOCR(imgPath=None):
     # list to store the grouped text as objects
     grouped_text_objects = []
 
-    # Draw bounding boxes of groups
     for cluster in clustered_text.values():
       all_x = []
       all_y = []
@@ -88,10 +103,11 @@ def ServerSpecOCR(imgPath=None):
     print(grouped_text_objects)
 
     # Display the image
-    plt.figure(figsize=(10, 10))
-    plt.imshow(imgPreview)
-    plt.axis('off')
-    plt.show()
+    if debug:
+        plt.figure(figsize=(10, 10))
+        plt.imshow(imgPreview)
+        plt.axis('off')
+        plt.show()
 
     # return the groups text object
     return grouped_text_objects[-1]
